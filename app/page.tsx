@@ -200,26 +200,26 @@ export default function Home() {
 
       {/* Panic Timer */}
       {!isLeaving && panicTimer > 0 && (
-        <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 z-30 px-8 py-4 rounded-lg backdrop-blur-sm shadow-2xl border-2 ${
+        <div className={`absolute top-4 left-4 z-30 px-6 py-3 rounded-lg backdrop-blur-sm shadow-2xl border-2 ${
           panicTimer <= 10 
             ? 'bg-red-600/90 dark:bg-red-700/90 border-red-500 animate-pulse' 
             : panicTimer <= 20
             ? 'bg-orange-500/90 dark:bg-orange-600/90 border-orange-400'
             : 'bg-yellow-500/80 dark:bg-yellow-600/80 border-yellow-400'
         }`}>
-          <p className="text-sm font-bold text-white mb-1 text-center">⚠️ URGENT: ACTION REQUIRED</p>
-          <p className={`text-3xl font-black text-white text-center font-mono ${
+          <p className="text-xs font-bold text-white mb-1 text-center">⚠️ URGENT</p>
+          <p className={`text-2xl font-black text-white text-center font-mono ${
             panicTimer <= 10 ? 'animate-pulse' : ''
           }`}>
             {Math.floor(panicTimer / 60)}:{(panicTimer % 60).toString().padStart(2, '0')}
           </p>
-          <p className="text-xs text-white/80 text-center mt-1">Time remaining</p>
+          <p className="text-xs text-white/80 text-center mt-0.5">Time remaining</p>
         </div>
       )}
 
       {/* Progress indicator */}
       {!isLeaving && (
-        <div className={`absolute ${panicTimer > 0 ? 'top-24' : 'top-8'} left-1/2 transform -translate-x-1/2 z-20 bg-white/80 dark:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm shadow-lg transition-all duration-300`}>
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/80 dark:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm shadow-lg">
           <p className="text-lg font-semibold">
             Clicks: {clicksCount} / {clicksRequired}
           </p>
