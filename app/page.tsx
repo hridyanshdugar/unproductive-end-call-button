@@ -112,8 +112,6 @@ export default function Home() {
         setIsLeaving(true);
         setShowMessage(true);
         setTimeout(() => {
-          // In a real app, this would actually end the call
-          alert('Call ended! (Just kidding, this is a demo)');
           initializeGame();
           setIsLeaving(false);
           setShowMessage(false);
@@ -122,29 +120,34 @@ export default function Home() {
       }
     }
     
-    // Always move the button (whether click counted or not) to make it frustrating
+    // Scramble ALL buttons (main button and all distracting buttons)
     setButtonPosition(generateRandomPosition());
-    // Change button color
     setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
     
-    // Move some distracting buttons too
+    // Scramble all distracting buttons to new random positions
     setDistractingButtons(prev => 
-      prev.map(btn => 
-        Math.random() > 0.5 
-          ? { ...btn, ...generateRandomPosition(), color: colors[Math.floor(Math.random() * colors.length)], text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)] }
-          : btn
-      )
+      prev.map(btn => ({
+        ...btn,
+        ...generateRandomPosition(),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)]
+      }))
     );
   };
 
   const handleDistractorClick = (id: number) => {
-    // Move the clicked distractor button
+    // Scramble ALL buttons when a distractor is clicked
+    setButtonPosition(generateRandomPosition());
+    setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
+    
+    // Scramble all distracting buttons to new random positions
     setDistractingButtons(prev =>
-      prev.map(btn =>
-        btn.id === id
-          ? { ...btn, ...generateRandomPosition(), color: colors[Math.floor(Math.random() * colors.length)], text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)] }
-          : btn
-      )
+      prev.map(btn => ({
+        ...btn,
+        ...generateRandomPosition(),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)]
+      }))
     );
   };
 
