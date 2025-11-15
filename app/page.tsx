@@ -35,12 +35,13 @@ export default function Home() {
   }, []);
 
   const initializeGame = useCallback(() => {
-    // Random number of clicks required (between 5 and 15)
-    const required = Math.floor(Math.random() * 11) + 5;
+    // Random number of clicks required (between 3 and 5)
+    const required = Math.floor(Math.random() * 3) + 3;
     setClicksRequired(required);
     setClicksCount(0);
     setButtonPosition(generateRandomPosition());
     setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
+    setCallDuration(0); // Reset call duration
     
     // Generate 8-12 distracting buttons
     const numDistractors = Math.floor(Math.random() * 5) + 8;
@@ -75,6 +76,23 @@ export default function Home() {
     }
   }, []);
 
+  // Call duration timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
+  // Format duration as HH:MM:SS
+  const formatDuration = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
@@ -83,34 +101,40 @@ export default function Home() {
   };
 
   const handleLeaveClick = () => {
-    const newCount = clicksCount + 1;
-    setClicksCount(newCount);
+    // 50% chance that the click actually counts
+    const clickCounts = Math.random() < 0.5;
+    
+    if (clickCounts) {
+      const newCount = clicksCount + 1;
+      setClicksCount(newCount);
 
-    if (newCount >= clicksRequired) {
-      setIsLeaving(true);
-      setShowMessage(true);
-      setTimeout(() => {
-        // In a real app, this would actually end the call
-        alert('Call ended! (Just kidding, this is a demo)');
-        initializeGame();
-        setIsLeaving(false);
-        setShowMessage(false);
-      }, 1000);
-    } else {
-      // Move the button to a new random position
-      setButtonPosition(generateRandomPosition());
-      // Change button color
-      setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
-      
-      // Move some distracting buttons too
-      setDistractingButtons(prev => 
-        prev.map(btn => 
-          Math.random() > 0.5 
-            ? { ...btn, ...generateRandomPosition(), color: colors[Math.floor(Math.random() * colors.length)], text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)] }
-            : btn
-        )
-      );
+      if (newCount >= clicksRequired) {
+        setIsLeaving(true);
+        setShowMessage(true);
+        setTimeout(() => {
+          // In a real app, this would actually end the call
+          alert('Call ended! (Just kidding, this is a demo)');
+          initializeGame();
+          setIsLeaving(false);
+          setShowMessage(false);
+        }, 1000);
+        return;
+      }
     }
+    
+    // Always move the button (whether click counted or not) to make it frustrating
+    setButtonPosition(generateRandomPosition());
+    // Change button color
+    setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
+    
+    // Move some distracting buttons too
+    setDistractingButtons(prev => 
+      prev.map(btn => 
+        Math.random() > 0.5 
+          ? { ...btn, ...generateRandomPosition(), color: colors[Math.floor(Math.random() * colors.length)], text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)] }
+          : btn
+      )
+    );
   };
 
   const handleDistractorClick = (id: number) => {
@@ -144,7 +168,7 @@ export default function Home() {
         <div className="text-center z-10">
           <div className="text-6xl mb-4">📞</div>
           <h1 className="text-4xl font-bold mb-2">Call in Progress</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">Duration: 00:00:00</p>
+          <p className="text-xl text-gray-600 dark:text-gray-400">Duration: {formatDuration(callDuration)}</p>
         </div>
       </div>
 
