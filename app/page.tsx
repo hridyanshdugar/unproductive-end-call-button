@@ -24,6 +24,7 @@ export default function Home() {
   const [isLeaving, setIsLeaving] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [callDuration, setCallDuration] = useState(0); // Duration in seconds
 
   const generateRandomPosition = useCallback(() => {
     // Generate position avoiding edges (10% margin)
