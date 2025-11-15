@@ -25,6 +25,7 @@ export default function Home() {
   const [showMessage, setShowMessage] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [callDuration, setCallDuration] = useState(0); // Duration in seconds
+  const [panicTimer, setPanicTimer] = useState(0); // Panic timer in seconds
 
   const generateRandomPosition = useCallback(() => {
     // Generate position avoiding edges (10% margin)
@@ -42,6 +43,8 @@ export default function Home() {
     setButtonPosition(generateRandomPosition());
     setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
     setCallDuration(0); // Reset call duration
+    // Set panic timer to random time between 30-60 seconds
+    setPanicTimer(Math.floor(Math.random() * 31) + 30);
     
     // Generate 8-12 distracting buttons
     const numDistractors = Math.floor(Math.random() * 5) + 8;
@@ -84,6 +87,26 @@ export default function Home() {
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
+
+  // Panic timer countdown
+  useEffect(() => {
+    if (panicTimer <= 0) return;
+    
+    const interval = setInterval(() => {
+      setPanicTimer(prev => {
+        if (prev <= 1) {
+          // Timer reached zero - reset it to create panic but do nothing
+          setTimeout(() => {
+            setPanicTimer(Math.floor(Math.random() * 31) + 30);
+          }, 2000);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [panicTimer]);
 
   // Format duration as HH:MM:SS
   const formatDuration = (seconds: number): string => {
@@ -175,9 +198,28 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Panic Timer */}
+      {!isLeaving && panicTimer > 0 && (
+        <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 z-30 px-8 py-4 rounded-lg backdrop-blur-sm shadow-2xl border-2 ${
+          panicTimer <= 10 
+            ? 'bg-red-600/90 dark:bg-red-700/90 border-red-500 animate-pulse' 
+            : panicTimer <= 20
+            ? 'bg-orange-500/90 dark:bg-orange-600/90 border-orange-400'
+            : 'bg-yellow-500/80 dark:bg-yellow-600/80 border-yellow-400'
+        }`}>
+          <p className="text-sm font-bold text-white mb-1 text-center">⚠️ URGENT: ACTION REQUIRED</p>
+          <p className={`text-3xl font-black text-white text-center font-mono ${
+            panicTimer <= 10 ? 'animate-pulse' : ''
+          }`}>
+            {Math.floor(panicTimer / 60)}:{(panicTimer % 60).toString().padStart(2, '0')}
+          </p>
+          <p className="text-xs text-white/80 text-center mt-1">Time remaining</p>
+        </div>
+      )}
+
       {/* Progress indicator */}
       {!isLeaving && (
-        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20 bg-white/80 dark:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm shadow-lg">
+        <div className={`absolute ${panicTimer > 0 ? 'top-24' : 'top-8'} left-1/2 transform -translate-x-1/2 z-20 bg-white/80 dark:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm shadow-lg transition-all duration-300`}>
           <p className="text-lg font-semibold">
             Clicks: {clicksCount} / {clicksRequired}
           </p>
