@@ -2,6 +2,19 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+const colors = [
+  '#ef4444', // red
+  '#3b82f6', // blue
+  '#10b981', // green
+  '#f59e0b', // amber
+  '#8b5cf6', // purple
+  '#ec4899', // pink
+  '#06b6d4', // cyan
+  '#f97316', // orange
+];
+
+const buttonTexts = ['Leave Call', 'End Call', 'Hang Up', 'Disconnect', 'Exit Call'];
+
 export default function Home() {
   const [clicksRequired, setClicksRequired] = useState(0);
   const [clicksCount, setClicksCount] = useState(0);
@@ -11,17 +24,6 @@ export default function Home() {
   const [isLeaving, setIsLeaving] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-
-  const colors = [
-    '#ef4444', // red
-    '#3b82f6', // blue
-    '#10b981', // green
-    '#f59e0b', // amber
-    '#8b5cf6', // purple
-    '#ec4899', // pink
-    '#06b6d4', // cyan
-    '#f97316', // orange
-  ];
 
   const generateRandomPosition = useCallback(() => {
     // Generate position avoiding edges (10% margin)
@@ -41,7 +43,6 @@ export default function Home() {
     
     // Generate 8-12 distracting buttons
     const numDistractors = Math.floor(Math.random() * 5) + 8;
-    const buttonTexts = ['Leave Call', 'End Call', 'Hang Up', 'Disconnect', 'Exit Call'];
     const distractors = Array.from({ length: numDistractors }, (_, i) => ({
       id: i,
       ...generateRandomPosition(),
@@ -49,11 +50,12 @@ export default function Home() {
       text: buttonTexts[Math.floor(Math.random() * buttonTexts.length)],
     }));
     setDistractingButtons(distractors);
-  }, [colors, generateRandomPosition]);
+  }, [generateRandomPosition]);
 
   useEffect(() => {
     initializeGame();
-  }, [initializeGame]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Dark mode initialization and persistence
   useEffect(() => {
@@ -100,7 +102,6 @@ export default function Home() {
       setButtonColor(colors[Math.floor(Math.random() * colors.length)]);
       
       // Move some distracting buttons too
-      const buttonTexts = ['Leave Call', 'End Call', 'Hang Up', 'Disconnect', 'Exit Call'];
       setDistractingButtons(prev => 
         prev.map(btn => 
           Math.random() > 0.5 
@@ -113,7 +114,6 @@ export default function Home() {
 
   const handleDistractorClick = (id: number) => {
     // Move the clicked distractor button
-    const buttonTexts = ['Leave Call', 'End Call', 'Hang Up', 'Disconnect', 'Exit Call'];
     setDistractingButtons(prev =>
       prev.map(btn =>
         btn.id === id
